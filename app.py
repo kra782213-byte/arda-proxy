@@ -1,41 +1,59 @@
-from flask import Flask, Response
-import urllib3
+import time
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
 
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+chrome_options = Options()
+chrome_options.add_argument("--headless=new")
+chrome_options.add_argument("--no-sandbox")
+chrome_options.add_argument("--disable-dev-shm-usage")
+chrome_options.add_argument("--disable-gpu")
+chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
 
-app = Flask(__name__)
-
-@app.route('/')
-def home():
-    return "Ardaspor Sabit Bein Sports Proxy Aktif!"
-
-@app.route('/liste.m3u')
-def generate_m3u():
-    # Senin bulduğun ve Bein Sports'ların çalıştığını KESİN olarak bildiğimiz CDN
-    CDN_BASE = "https://css.d6e3eds5e065t5.help//"
+def get_channels():
+    print("[*] Görünmez tarayıcı başlatılıyor...")
+    driver = webdriver.Chrome(options=chrome_options)
+    m3u_list = ["#EXTM3U"]
     
-    # Sadece çalıştığını bildiğimiz kodlar
-    KANALLAR = {
-        "Bein Sports 1": "b1",
-        "Bein Sports 2": "b2",
-        "Bein Sports 3": "b3",
-        "Bein Sports 4": "b4",
-        "Bein Sports 5": "b5",
-        "Bein Sports Max 1": "bm1",
-        "Bein Sports Max 2": "bm2"
-    }
-
-    m3u = "#EXTM3U\n"
-    
-    for isim, kod in KANALLAR.items():
-        yayin_url = f"{CDN_BASE}{kod}/tracks-v1a1/mono.m3u8"
+    try:
+        driver.get("https://ardaspor39.top")
+        time.sleep(5)
         
-        m3u += f'#EXTINF:-1 group-title="Ardaspor TV", {isim}\n'
-        m3u += f'#EXTVLCOPT:http-referrer=https://ardaspor39.top/\n'
-        m3u += f'#EXTVLCOPT:http-user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64)\n'
-        m3u += f'{yayin_url}\n\n'
+        try:
+            tv_tab = driver.find_element(By.XPATH, "//*[contains(text(), 'TV')]")
+            tv_tab.click()
+            time.sleep(5)
+        except Exception as e:
+            print("[-] TV sekmesi bulunamadı.")
 
-    return Response(m3u, mimetype='application/x-mpegurl')
+        elements = driver.find_elements(By.CSS_SELECTOR, "a[href*='/channel/']")
+        
+        for el in elements:
+            try:
+                href = el.get_attribute("href")
+                kanal_id = href.split('/')[-1]
+                name = el.text.strip()
+                
+                if not name:
+                    name = f"Kanal {kanal_id}"
+                    
+                m3u_list.append(f'#EXTINF:-1 group-title="Ardaspor", {name}')
+                # DİKKAT: Burası artık Ardaspor Vercel linkine gidiyor
+                m3u_list.append(f'https://arda-proxy.vercel.app/play/{kanal_id}')
+            except:
+                pass
+                
+    except Exception as e:
+        print(f"[-] Hata: {e}")
+    finally:
+        driver.quit()
+        
+    return "\n".join(m3u_list)
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+if __name__ == "__main__":
+    m3u_content = get_channels()
+    
+    # Listeyi dosyaya kaydet
+    with open("ardaspor.m3u", "w", encoding="utf-8") as f:
+        f.write(m3u_content)
+    print("[+] Liste 'ardaspor.m3u' dosyasına kaydedildi.")
