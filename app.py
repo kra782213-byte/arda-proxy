@@ -7,14 +7,14 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return "Ardaspor Sabit CDN Proxy Aktif!"
+    return "Ardaspor Sabit Bein Sports Proxy Aktif!"
 
 @app.route('/liste.m3u')
 def generate_m3u():
-    # Senin verdiğin CDN adresi
+    # Senin bulduğun ve Bein Sports'ların çalıştığını KESİN olarak bildiğimiz CDN
     CDN_BASE = "https://css.d6e3eds5e065t5.help//"
     
-    # Kanallar ve o CDN'deki kısa kodları
+    # Sadece çalıştığını bildiğimiz kodlar
     KANALLAR = {
         "Bein Sports 1": "b1",
         "Bein Sports 2": "b2",
@@ -22,30 +22,12 @@ def generate_m3u():
         "Bein Sports 4": "b4",
         "Bein Sports 5": "b5",
         "Bein Sports Max 1": "bm1",
-        "Bein Sports Max 2": "bm2",
-        "S Sport 1": "s1",
-        "S Sport 2": "s2",
-        "S Sport Plus 1": "sp1",
-        "S Sport Plus 2": "sp2",
-        "TRT 1": "trt1",
-        "TRT Spor": "trtspor",
-        "ATV": "atv",
-        "A Spor": "aspor",
-        "A Haber": "ahaber",
-        "TV8": "tv8",
-        "Exxen Spor 1": "e1",
-        "Exxen Spor 2": "e2",
-        "Tabii Spor 1": "tab1",
-        "Tivibu Spor 1": "tiv1",
-        "Smart Spor 1": "sm1",
-        "UFC": "ufc",
-        "DAZN": "dazn"
+        "Bein Sports Max 2": "bm2"
     }
 
     m3u = "#EXTM3U\n"
     
     for isim, kod in KANALLAR.items():
-        # URL'yi senin verdiğin formata birebir uyduruyoruz (çift slash dahil)
         yayin_url = f"{CDN_BASE}{kod}/tracks-v1a1/mono.m3u8"
         
         m3u += f'#EXTINF:-1 group-title="Ardaspor TV", {isim}\n'
