@@ -7,14 +7,14 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return "Ardaspor Sabit Bein Sports Proxy Aktif!"
+    return "Ardaspor Kesin Calisan CDN Proxy!"
 
 @app.route('/liste.m3u')
 def generate_m3u():
-    # Senin bulduğun ve Bein Sports'ların çalıştığını KESİN olarak bildiğimiz CDN
+    # Çalıştığını KESİN olarak bildiğimiz CDN Sunucusu
     CDN_BASE = "https://css.d6e3eds5e065t5.help//"
     
-    # Sadece çalıştığını bildiğimiz kodlar
+    # Senin bulduğun ve test ettiğimiz KESİN kodlar
     KANALLAR = {
         "Bein Sports 1": "b1",
         "Bein Sports 2": "b2",
@@ -22,7 +22,8 @@ def generate_m3u():
         "Bein Sports 4": "b4",
         "Bein Sports 5": "b5",
         "Bein Sports Max 1": "bm1",
-        "Bein Sports Max 2": "bm2"
+        "Bein Sports Max 2": "bm2",
+        "S Sport 1": "ss" # Görselden kesinleşti
     }
 
     m3u = "#EXTM3U\n"
